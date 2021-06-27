@@ -1,0 +1,110 @@
+Sub challenge()
+
+    Range("I1").Value = "Ticker"
+    Range("J1").Value = "Yearly Change"
+    Range("K1").Value = "Percent Change"
+    Range("L1").Value = "Total Stock Volume"
+    
+    Dim stock As String
+    Dim opener As Double
+    Dim closer As Double
+    Dim vol As Double
+    vol = 0
+    Dim days As Double
+    Dim change1 As Double
+    Dim change2 As Double
+    
+    lastrow = Cells(Rows.Count, 1).End(xlUp).Row
+                        
+    Dim Summary_Table_Row As Integer
+    Summary_Table_Row = 2
+    
+    For i = 2 To lastrow
+        If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+            stock = Cells(i, 1).Value
+            
+            opener = Cells(i, 3).Value
+            closer = Cells(i - 260, 6).Value
+            
+            change1 = opener - closer
+            change2 = (opener - closer) / opener
+            
+            vol = vol + Cells(i, 7).Value
+                        
+            Range("I" & Summary_Table_Row).Value = stock
+            Range("J" & Summary_Table_Row).Value = change1
+            Range("K" & Summary_Table_Row).Value = change2
+            Range("L" & Summary_Table_Row).Value = vol
+            
+            Summary_Table_Row = Summary_Table_Row + 1
+            
+            vol = 0
+        Else
+            
+            vol = vol + Cells(i, 7).Value
+                        
+        End If
+        
+    Next i
+    
+
+End Sub
+
+Sub format()
+    Dim rng As Range
+    Dim con1 As FormatCondition
+    Dim con2 As FormatCondition
+        
+    Set rng = Range("J2", "J8000")
+    
+    Set con1 = rng.FormatConditions.Add(xlCellValue, xlGreater, "= 0")
+    Set con2 = rng.FormatConditions.Add(xlCellValue, xlLess, "=0")
+    
+    With con1
+        .Interior.ColorIndex = 4
+    End With
+    
+    With con2
+        .Interior.ColorIndex = 3
+    End With
+End Sub
+
+Sub greatest()
+
+Dim inc_stock As String
+
+Sheet = ActiveSheet.Name
+
+Range("P1").Value = "Stock"
+Range("Q1").Value = "% Increase"
+Range("O2").Value = "Greatest % Increase"
+Range("O3").Value = "Greatest % Decrease"
+Range("O4").Value = "Greatest Total Volume"
+
+
+Dim ws As Worksheet
+Set ws = Worksheets(Sheet)
+
+ws.Range("Q2") = Application.WorksheetFunction.Max(ws.Range("K2:K291"))
+ws.Range("Q3") = Application.WorksheetFunction.Min(ws.Range("K2:K291"))
+ws.Range("Q4") = Application.WorksheetFunction.Max(ws.Range("L2:L291"))
+
+inc = Range("Q2").Value
+dec = Range("Q3").Value
+tot = Range("Q4").Value
+
+For i = 2 To 290
+    If Cells(i, 11).Value = inc Then
+        inc_stock = Cells(i, 9).Value
+    ElseIf Cells(i, 11) = dec Then
+        dec_stock = Cells(i, 9).Value
+    ElseIf Cells(i, 12).Value = tot Then
+        tot_stock = Cells(i, 9).Value
+    End If
+Next i
+
+Range("P2").Value = inc_stock
+Range("P3").Value = dec_stock
+Range("P4").Value = tot_stock
+
+End Sub
